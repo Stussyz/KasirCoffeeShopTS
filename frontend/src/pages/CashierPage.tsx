@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getProducts } from "../services/productService";
 import type { Product } from "../types/product";
 import type { CartItem } from "../types/cart"
+import { createTransaction } from "../services/transactionService";
 
 // EXPORT DEFAULT ADALAH UNTUK: 
 // MENGEKSPOR SEBUAH FUNGSI, KELAS, OBJEK, ATAU NILAI LAIN SEBAGAI NILAI DEFAULT DARI MODULE. 
@@ -50,7 +51,7 @@ export default function CashierPage() {
                         ? { 
                             ...item, 
                             quantity: item.quantity + 1, 
-                            subtotal: (item.quantity + 1) * item.price,
+                            subtotal: (item.quantity + 1) * Number(item.price),
                         }
                         : item
                     );
@@ -68,7 +69,7 @@ export default function CashierPage() {
     };
 
     // FUNCTION MENGHITUNG TOTAL HARGA BELANJAAN DI KERANJANG
-    const totalAmount = cart.reduce((acc, item) => acc + item.subtotal, 0);
+    const totalAmount = cart.reduce((acc, item) => acc + Number(item.subtotal), 0);
     
     // FUNCTION UNTUK MENINGKATKAN ATAU MENGURANGI KUANTITAS ITEM DI KERANJANG BELANJA
     const increaseQty = (id: number) => {
@@ -78,7 +79,7 @@ export default function CashierPage() {
                     ? {
                         ...item,
                         quantity: item.quantity + 1,
-                        subtotal: (item.quantity + 1) * item.price,
+                        subtotal: (item.quantity + 1) * Number(item.price),
                     }
                     : item
             )
@@ -92,12 +93,41 @@ export default function CashierPage() {
                     ? {
                         ...item,
                         quantity: item.quantity - 1,
-                        subtotal: (item.quantity - 1) * item.price,
+                        subtotal: (item.quantity - 1) * Number(item.price),
                     }
                     : item
             )
             .filter((item) => item.quantity > 0)
         );
+    };
+
+    // FUNCTION UNTUK MEMBUAT TRANSAKSI (CHECKOUT) DAN MENGIRIM DATA KE BACKEND
+    const [paymentAmount, setPaymentAmount] = useState<string>("");
+
+    const handleCheckout = async () => {
+        try {
+            const payload = {
+                user_id: 1,
+                payment_amount: Number(paymentAmount),
+                items: cart.map((item) => ({
+                    product_id: item.id,
+                    quantity: item.quantity,
+                    price: Number(item.price),
+                })),
+            };
+
+            const result = await createTransaction(payload);
+            
+            alert(
+                `Transaksi berhasil! Kembalian: Rp ${result.change_amount.toLocaleString("id-ID")}`
+            );
+
+            setCart([]);
+            setPaymentAmount("");
+        } catch (error) {
+            console.error("Checkout gagal:", error);
+            alert("Checkout gagal");
+        }
     };
 
     return (
@@ -129,42 +159,63 @@ export default function CashierPage() {
                     {cart.length === 0 ? (
                         <p className="text-gray-500">Belum ada item di keranjang</p>
                     ) : (
+                    <>
                         <div className="space-y-3">
                             {cart.map((item) => (
                                 <div key={item.id} className="border-b pb-2">
                                     <p className="font-semibold">{item.name}</p>
                                     <p>Qty: {item.quantity}</p>
                                     <p>Subtotal: Rp {Number(item.subtotal).toLocaleString("id-ID")}</p>
+
+                                    {/* MENAMBAH DAN MENGURANGI KUANTITAS */}
+                                    <div className="mt-2 flex items-center gap-2">
+                                        <button 
+                                        onClick={() => decreaseQty(item.id)}
+                                        className="rounded bg-gray-200 px-2 py-1"
+                                        >
+                                            -
+                                        </button>
+                                        <span>{item.quantity}</span>
+                                        <button 
+                                        onClick={() => increaseQty(item.id)}
+                                        className="rounded bg-gray-200 px-2 py-1"
+                                        >
+                                            +
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>
-                    )}
-                </div>
-            </div>
 
-            {/* MENGHITUNG HARGA TOTAL BELANJA */}
-            <div className="mt-4 border-t pt-4">
-                <p className="text-lg font-bold">
-                    Total: Rp {totalAmount.toLocaleString("id-ID")}
-                </p>
-            </div>
+                        {/* MENGHITUNG HARGA TOTAL BELANJA */}
+                        <div className="mt-4 pt-4">
+                            <p className="text-lg font-bold">
+                            Total: Rp {Number(totalAmount).toLocaleString("id-ID")}
+                            </p>
+                        </div>
 
-            <div className="mt-2 flex items-cernter gap-2">
-                <button 
-                onClick={() => decreaseQty(item.id)}
-                className="rounded bg-gray-200 px-2 py-1"
-                >
-                    -
-                </button>
-                <span>{item.quantity}</span>
-                <button 
-                onClick={() => increaseQty(item.id)}
-                className="rounded bg-gray-200 px-2 py-1"
-                >
-                    +
-                </button>
+                        <div className="mt-4">
+                            <input 
+                                type="number"
+                                value={paymentAmount}
+                                onChange={(e) => setPaymentAmount(e.target.value)}
+                                className="w-full rounded-lg border p-2"
+                                placeholder="Masukkan jumlah pembayaran"
+                            />
+                        </div>
+
+                        <button
+                        onClick={handleCheckout}
+                        className="mt-4 w-full rounded-lg bg-green-600 px-4 py-2 text-white"
+                        >
+                            Bayar
+                        </button>
+                    </>
+                )}
             </div>
         </div>
+    </div>
     );
 }
+
 
