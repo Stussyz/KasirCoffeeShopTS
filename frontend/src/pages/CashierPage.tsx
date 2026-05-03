@@ -96,7 +96,7 @@ export default function CashierPage() {
     const decreaseQty = (id: number) => {
         setCart((prev) =>
             prev.map((item) =>
-                item.id === id && item.quantity > 1
+                item.id === id
                     ? {
                         ...item,
                         quantity: item.quantity - 1,
