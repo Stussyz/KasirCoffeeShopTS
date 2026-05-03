@@ -4,13 +4,12 @@ import type { Product } from "../types/product";
 import type { CartItem } from "../types/cart"
 import { createTransaction } from "../services/transactionService";
 
-// EXPORT DEFAULT ADALAH UNTUK: 
-// MENGEKSPOR SEBUAH FUNGSI, KELAS, OBJEK, ATAU NILAI LAIN SEBAGAI NILAI DEFAULT DARI MODULE. 
-// PADA KASUS INI, FUNGSI CashierPage DI EKSPOR SEBAGAI NILAI DEFAULT, 
-// SEHINGGA BISA DIIMPOR TANPA HARUS MENGGUNAKAN NAMA YANG SAMA DENGAN FUNGSI TERSEBUT.
+// EXPORT FUNGSI, KELAS, OBJEK, ATAU NILAI LAIN SEBAGAI DEFAULT VALUE DARI MODULE. 
 export default function CashierPage() {
+    // STATE <Product> digunakan untuk menyimpan daftar produk yang diambil dari backend.
+    // TYPE "Product[]" digunakan karena setiap element dalam array harus sesuai dengan struktur yang didefinisikan dalam interface "Product" yang diimpor dari "../types/product".
     const [products, setProducts] = useState<Product[]>([
-        // just for testing, will be removed later!.
+        // Data dummy ini digunakan untuk melakukan tes fetching data produk dari backend!!!!
         // {
         //     id: 1,
         //     category_id: 1,
@@ -24,7 +23,7 @@ export default function CashierPage() {
 
     // FUNCTION MENYIMPAN ITEM YANG DITAMBAHKAN KE KERANJANG BELANJA
     const [cart, setCart] = useState<CartItem[]>([]);
-
+    // "useEffect" (hook React) akan menjalankan sebuah proses setelah komponen dirender pertama kali
     useEffect (() => {
         const fetchProducts = async () => {
             try{
@@ -38,17 +37,23 @@ export default function CashierPage() {
         };
 
         fetchProducts();
+        // Dependency array kosong "[]" dipakai agar function "fetchProducts" hanya dijalankan sekali saat komponen pertama kali muncul
+        // Kalau tidak ada dependency array kosong maka fetching data akan berjalan terus menerus setiap kali komponen dirender
     }, []);
 
     // FUNCTION MENAMBAHKAN PRODUK KE KERANJANG BELANJA
     const addToCart = (product: Product) => {
+        // State dibawah ini (prevCart) dipakai untuk memeriksa apakah produk yang ditambahkan sudah ada di keranjang belanja atau belum
         setCart((prevCart) => {
+            // ".find" adalah method array yg dipakai untuk mencari item dalam array "prevCart" yg memiliki "id" yg sama dengan "product.id" 
             const existingItem = prevCart.find((item) => item.id === product.id);
             
             if (existingItem) {
+                // map adalah method array yg dipakai untuk mengupdate item tertentu tanpa mengubah item lainnya dalam array "prevCart"
                 return prevCart.map((item) =>
                     item.id === product.id
                         ? { 
+                            // spread operator "...item" dipakai agar properti yg lama tetap ada, lalu kita update "quantity" dan "subtotal" sesuai dengan penambahan produk yang sama  
                             ...item, 
                             quantity: item.quantity + 1, 
                             subtotal: (item.quantity + 1) * Number(item.price),
@@ -60,6 +65,7 @@ export default function CashierPage() {
                 return [
                     ...prevCart,
                     {
+                        // sama juga kayak "...item" tapi ini untuk menambahkan properti baru "quantity" dan "subtotal" ke dalam objek produk yang ditambahkan ke keranjang belanja
                         ...product,
                         quantity: 1,
                         subtotal: product.price,
@@ -71,7 +77,7 @@ export default function CashierPage() {
     // FUNCTION MENGHITUNG TOTAL HARGA BELANJAAN DI KERANJANG
     const totalAmount = cart.reduce((acc, item) => acc + Number(item.subtotal), 0);
     
-    // FUNCTION UNTUK MENINGKATKAN ATAU MENGURANGI KUANTITAS ITEM DI KERANJANG BELANJA
+    // FUNCTION UNTUK MENAMBAHKAN KUANTITAS ITEM DI KERANJANG BELANJA
     const increaseQty = (id: number) => {
         setCart((prev) =>
             prev.map((item) =>
@@ -86,6 +92,7 @@ export default function CashierPage() {
         );
     };
 
+    // FUNCTION UNTUK MENGURANGI KUANTITAS ITEM DI KERANJANG BELANJA
     const decreaseQty = (id: number) => {
         setCart((prev) =>
             prev.map((item) =>
@@ -102,6 +109,9 @@ export default function CashierPage() {
     };
 
     // FUNCTION UNTUK MEMBUAT TRANSAKSI (CHECKOUT) DAN MENGIRIM DATA KE BACKEND
+    // Tipe data "STRING" digunakan pada state "paymentAmount" karena input HTML selalu mengembalikan nilai sebagai string, meskipun tipe inputnya adalah "number".
+    // Apabila menggunakan tipe data "NUMBER" maka input angka pembayaran akan error.
+    // Sehingga diperlukan konversi ke "NUMBER" saat mengirim data ke backend dengan menggunakan "Number(paymentAmount)" 
     const [paymentAmount, setPaymentAmount] = useState<string>("");
 
     const handleCheckout = async () => {
