@@ -1,5 +1,5 @@
 // TUGAS:
-// Menampilkan "Total, Pembayaran, dan Kembalian"
+// Hanya menampilkan "Total, Pembayaran, dan Kembalian" bukan melakukan penghitungan
 
 import { formatNumber } from "../utils/currency";
 
@@ -26,7 +26,9 @@ export default function CartSummary({
         <p className="text-sm text-gray-600">
           Pembayaran: Rp {formatNumber(paymentAmount || 0)}
         </p>
+
         <p className="text-sm text-gray-600">
+            {/* Math.max untuk menghindari kembalian menjadi minus ketika paymentAmount < totalAmount */}
           Kembalian: Rp {formatNumber(Math.max(changeAmount, 0))}
         </p>
       </div>
