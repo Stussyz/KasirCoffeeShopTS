@@ -21,6 +21,11 @@ export function useCart() {
 
       // Jika sudah ada, cukup tambah quantity dan subtotal
       if (existingItem) {
+        // validasi untuk mencegah quantity yang di add melebihi stock yang ada
+        if (existingItem.quantity >= product.stock) {
+            alert(`Stock ${product.name} tidak mencukupi`);
+            return prevCart;
+        }
         return prevCart.map((item) =>
           item.id === product.id
             ? {
@@ -47,15 +52,22 @@ export function useCart() {
   // Menambah quantity item di cart
   const increaseQty = (id: number) => {
     setCart((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
+      prev.map((item) => {
+        if (item.id === id) {
+            if (item.quantity >= item.stock) {
+                alert (`Stok ${item.name} tidak mencukupi`);
+                return item;
+            }
+
+            return {
               ...item,
               quantity: item.quantity + 1,
               subtotal: (item.quantity + 1) * Number(item.price),
-            }
-          : item
-      )
+            };
+        }
+       
+        return item;
+      })
     );
   };
 
