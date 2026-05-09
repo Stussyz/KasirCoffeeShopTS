@@ -47,10 +47,13 @@ export default function CashierPage() {
   }, []);
 
   // Menghitung total semua subtotal item yang ada di keranjang
+  // "reduce" = function array untuk menghitung semua subtotal item di cart menjadi satu angka "totalAmount"   
+  // "acc" = accumulator, "item" = item yg dikeranjang sekarang
   const totalAmount = cart.reduce((acc, item) => acc + Number(item.subtotal), 0);
 
   // Menghitung estimasi kembalian
-  // Jika input pembayaran kosong, dianggap 0
+  // Jika input pembayaran kosong, maka dianggap 0
+  // kembalian = paymentAmount - totalAmount
   const changeAmount = Number(paymentAmount || 0) - totalAmount;
 
   // Function checkout untuk mengirim transaksi ke backend
@@ -101,7 +104,7 @@ export default function CashierPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div>
       <h1 className="mb-6 text-3xl font-bold">Kasir Coffee Shop</h1>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
