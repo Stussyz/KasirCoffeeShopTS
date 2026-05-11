@@ -25,18 +25,18 @@ A fullstack cashier web application for a coffee shop built with React, TypeScri
 - mysql2
 
 ## Project Structure
-kasirTS/frontend/
-kasirTS/backend/
+- kasirTS/frontend/
+- kasirTS/backend/
 
 ## How To Run:
 ### Frontend
-cd frontend
-npm install or npm -i
-npm run dev
+- cd frontend
+- npm install or npm -i
+- npm run dev
 ### Backend
-cd backend
-npm install or npm -i
-npm run dev
+- cd backend
+- npm install or npm -i
+- npm run dev
 
 ## Note:
 before running the system, please create database named 'kasir_ts' (or you can change it, make sure .env on /backend already changed too), then create the required tables:
