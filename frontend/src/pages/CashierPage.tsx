@@ -17,6 +17,7 @@ import ProductCard from "../components/ProductCard";
 import CartItemCard from "../components/CartItemCard";
 import CartSummary from "../components/CartSummary";
 import PaymentSection from "../components/PaymentSection";
+import PageHeader from "../components/PageHeader";
 
 export default function CashierPage() {
   // Menyimpan daftar produk yang diambil dari backend
@@ -30,15 +31,28 @@ export default function CashierPage() {
   // Artinya semua logic cart sekarang diambil dari file hooks/useCart.ts
   const { cart, addToCart, increaseQty, decreaseQty, clearCart } = useCart();
 
+  // state loading dan error saat akan menampilkan produk
+  const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(false);
+  const [productsError, setProductsError] = useState<string>("");
+
+  // state loading pada untuk checkout
+  const [isCheckingOut, setIsCheckingOut] = useState<boolean>(false);
+  
   // Mengambil produk dari backend saat halaman pertama dibuka
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setIsLoadingProducts(true);
+        setProductsError("");
+
         const data = await getProducts();
         console.log("Data products:", data);
         setProducts(data);
       } catch (error) {
         console.error("Gagal fetching products:", error);
+        setProductsError("Gagal memuat data produk");
+      } finally {
+        setIsLoadingProducts(false);
       }
     };
 
@@ -75,6 +89,8 @@ export default function CashierPage() {
     }
 
     try {
+      setIsCheckingOut(true);
+
       // Payload = object data yang akan dikirim ke backend
       const payload = {
         user_id: 1,
@@ -97,19 +113,53 @@ export default function CashierPage() {
       // Reset cart dan input setelah checkout sukses
       clearCart();
       setPaymentAmount("");
+      setProducts((prevProducts) =>
+        prevProducts.map((product) => {
+          const soldItem = cart.find((item) => item.id === product.id);
+
+          if (!soldItem) return product;
+          
+          return {
+            ...product,
+            stock: product.stock - soldItem.quantity,
+          };
+        })
+      );  
     } catch (error) {
       console.error("Checkout gagal:", error);
       alert("Checkout gagal");
+    } finally {
+      setIsCheckingOut(false);
     }
   };
 
   return (
+
     <div>
-      <h1 className="mb-6 text-3xl font-bold">Kasir Coffee Shop</h1>
+      {/* Title diganti dengan komponen yg ada di PageHeader */}
+      {/* <h1 className="mb-6 text-3xl font-bold">Kasir Coffee Shop</h1> */}
+       <PageHeader 
+          title="Cashier Kentjana Coffee"
+          description="Mengelola transaksi dengan mudah dan cepat"
+        />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* KOLOM KIRI: daftar produk */}
         <div className="lg:col-span-2">
+          {/* conditional rendering = kondisi dibawah berdasarkan kondisi masing-masingnya */}
+          {isLoadingProducts ? (
+          <div className="rounded-xl bg-white p-6 shadow">
+            <p className="text-gray-500">Memuat produk...</p>
+          </div>
+          ) : productsError ? (
+            <div className="rounded-xl bg-white p-6 shadow">
+              <p className="text-red-500">{productsError}</p>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="rounded-xl bg-white p-6 shadow">
+              <p className="text-gray-500">Produk tidak tersedia</p>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {products.map((product) => (
               <ProductCard
@@ -119,6 +169,7 @@ export default function CashierPage() {
               />
             ))}
           </div>
+        )}
         </div>
 
         {/* KOLOM KANAN: keranjang */}
@@ -150,6 +201,7 @@ export default function CashierPage() {
                 paymentAmount={paymentAmount}
                 onChangePayment={setPaymentAmount}
                 onCheckout={handleCheckout}
+                isCheckingOut={isCheckingOut}
               />
             </>
           )}
