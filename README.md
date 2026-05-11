@@ -31,11 +31,11 @@ kasirTS/backend/
 ## How To Run:
 ### Frontend
 cd frontend
-npm install / npm -i
+npm install or npm -i
 npm run dev
 ### Backend
 cd backend
-npm install / npm -i
+npm install or npm -i
 npm run dev
 
 ## Note:
