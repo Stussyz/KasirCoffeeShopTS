@@ -1,7 +1,9 @@
 import express from "express";
 import cors from "cors";
+import authRoutes from "./routes/authRoutes";
 import productRoutes from "./routes/productRoutes";
 import transactionRoutes from "./routes/transactionRoutes";
+
 
 const app = express();
 const PORT = 5000;
@@ -13,10 +15,12 @@ app.get("/", (req, res) => {
     res.send("Congrats!, your API is working fine!");
 });
 
+// add routes baru: /auth
+app.use("/auth", authRoutes);
 // add routes baru: /products
-app.use("/products", productRoutes)
+app.use("/products", productRoutes);
 // add routes baru: /transactions
-app.use("/transactions", transactionRoutes)
+app.use("/transactions", transactionRoutes);
 
 app.listen(PORT, () => {
     console.log(`Your server is running on http://localhost:${PORT}`);
