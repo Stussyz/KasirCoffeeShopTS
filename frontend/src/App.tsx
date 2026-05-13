@@ -3,17 +3,46 @@ import MainLayout from "./layouts/MainLayout";
 import CashierPage from "./pages/CashierPage";
 import TransactionsHistoryPage from "./pages/TransactionHistoryPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import LoginPage from "./pages/LoginPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
-    <MainLayout>
       <Routes>
-        <Route path="/" element={<CashierPage />} />
-        <Route path="/transactions" element={<TransactionsHistoryPage/>} />
-        <Route path="*" element={<NotFoundPage />} />
+        <Route path="/login" element={<LoginPage />} />
+
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <CashierPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/transactions"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <TransactionsHistoryPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="*"
+          element={
+            <MainLayout>
+              <NotFoundPage />
+            </MainLayout>
+          }
+        />
       </Routes>
-    </MainLayout>
     </BrowserRouter>
   );
 }
