@@ -7,7 +7,14 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-    const { user } = useAuth();
+    const { user, isAuthLoading } = useAuth();
+    if (!isAuthLoading) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-gray-100">
+                <p className="text-gray-500">Memeriksa sesi login..</p>
+            </div>
+        );
+    }
 
     // Kalau belum login, paksa ke halaman login
     if (!user) {
