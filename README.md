@@ -48,7 +48,7 @@ before running the system, please create database named 'kasir_ts' (or you can c
 
 ## FUTURE IMPROVEMENTS:
 - authentication
-- dashboard
-- product management
-- printable recepit
+- dashboard landing page
+- product management (CRUD)
+- printable recepit with customer name
 - filter by category
