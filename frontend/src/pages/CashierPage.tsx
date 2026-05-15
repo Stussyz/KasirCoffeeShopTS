@@ -20,6 +20,7 @@ import PaymentSection from "../components/PaymentSection";
 import PageHeader from "../components/PageHeader";
 
 export default function CashierPage() {
+    // console.log("CashierPage berhasil dirender");
   // Menyimpan daftar produk yang diambil dari backend
   const [products, setProducts] = useState<Product[]>([]);
 
@@ -134,7 +135,6 @@ export default function CashierPage() {
   };
 
   return (
-
     <div>
       {/* Title diganti dengan komponen yg ada di PageHeader */}
       {/* <h1 className="mb-6 text-3xl font-bold">Kasir Coffee Shop</h1> */}
