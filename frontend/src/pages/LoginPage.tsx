@@ -1,16 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services/authServices";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function LoginPage () {
     const navigate = useNavigate();
-    const { setUser } = useAuth();
+    const { user, setUser, isAuthLoading } = useAuth();
 
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    
+    // Kalau user sudah login dan auth sudah selesai dicek, jangan biarkan tetap di /login
+    useEffect(() => {
+        console.log("LoginPage -> user:", user);
+        console.log("LoginPage -> isAuthLoading:", isAuthLoading);
+
+        if (!isAuthLoading && user) {
+        navigate("/", { replace: true });
+        }
+    }, [user, isAuthLoading, navigate]);
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -33,7 +43,7 @@ export default function LoginPage () {
             localStorage.setItem("auth_user", JSON.stringify(result.user));
 
             // Setelah login sukses, arahkan ke halaman kasir
-            navigate("/");
+            navigate("/", { replace: true });
         } catch (error: any) {
             console.error("Login gagal:", error);
 
