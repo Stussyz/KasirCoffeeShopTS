@@ -6,7 +6,7 @@ export default function Navbar() {
     // useLocation dipakai untuk mengetahui URL aktif sekarang
     const location = useLocation();
     const navigate = useNavigate();
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
 
     const isActive = (path : string) => location.pathname === path;
     const handleLogout = () => {
