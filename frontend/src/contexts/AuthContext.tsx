@@ -24,16 +24,27 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<AuthUser | null>(null);
     // state ini untuk mengecek apakah aplikasi sedang mengecek localStorage
     const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
+    
     // ketika app dibuka, ambil user dari localStorage (kalau ada)
     useEffect(() => {
+        try {
         const storedUser = localStorage.getItem("auth_user");
+        console.log("storedUser dari localStorage:", storedUser);
 
         if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            console.log("parsedUser:", parsedUser);
             setUser(JSON.parse(storedUser));
         }
-
-        // setelah pengecekan localStorage selesai, loading auth dimatikan
-        setIsAuthLoading(false);
+        } catch (error) {
+            console.error("Gagal membaca auth_user dari localStorage:", error);
+            localStorage.removeItem("auth_user");
+            setUser(null);
+        } finally {
+             console.log("Auth loading selesai");
+             // setelah pengecekan localStorage selesai, loading auth dimatikan
+             setIsAuthLoading(false);
+        }
     }, []);
 
     const logout = () => {
