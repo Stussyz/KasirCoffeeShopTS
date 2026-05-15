@@ -8,7 +8,11 @@ interface ProtectedRouteProps {
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     const { user, isAuthLoading } = useAuth();
-    if (!isAuthLoading) {
+
+    console.log("ProtectedRoute -> isAuthLoading:", isAuthLoading);
+    console.log("ProtectedRoute -> user:", user);
+    
+    if (isAuthLoading) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-gray-100">
                 <p className="text-gray-500">Memeriksa sesi login..</p>
@@ -21,5 +25,5 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
         return <Navigate to = "/login" replace />;
     }
 
-    return <>{ children }</>;
+    return <>{children}</>;
 }
